@@ -3,7 +3,7 @@ package br.edu.atitus.productservice.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "product_tb")
+@Table(name = "tb_product")
 public class ProductEntity {
 
     @Id
@@ -13,7 +13,7 @@ public class ProductEntity {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "branc")
+    @Column(name = "brand")
     private String brand;
 
     @Column(name = "model")
