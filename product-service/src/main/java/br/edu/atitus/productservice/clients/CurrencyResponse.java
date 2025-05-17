@@ -1,35 +1,20 @@
-package br.edu.atitus.currencyservice.entities;
+package br.edu.atitus.productservice.clients;
 
-import jakarta.persistence.*;
 
-@Entity
-@Table(name = "tb_currency")
-public class CurrencyEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @Column(name = "source_currency", length = 3, nullable = false)
+public class CurrencyResponse {
+    private Long id;
     private String source;
-
-    @Column(name = "target_currency", length = 3, nullable = false)
-    private String targetCurrency;
-
-    @Column(name = "conversion_rate", nullable = false)
+    private String target;
     private double conversionRate;
-
-    @Transient
     private String environment;
-
-    @Transient
     private double convertedValue;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -41,12 +26,12 @@ public class CurrencyEntity {
         this.source = source;
     }
 
-    public String getTargetCurrency() {
-        return targetCurrency;
+    public String getTarget() {
+        return target;
     }
 
-    public void setTargetCurrency(String targetCurrency) {
-        this.targetCurrency = targetCurrency;
+    public void setTarget(String target) {
+        this.target = target;
     }
 
     public double getConversionRate() {
