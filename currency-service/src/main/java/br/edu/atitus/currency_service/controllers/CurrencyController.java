@@ -36,30 +36,42 @@ public class CurrencyController {
 			@PathVariable String target
 			) throws Exception {
 
-		CurrencyEntity currency;
 
-		if (source.equals("BRL")) {
-			CurrencyBCReponse response = currencyBCClient.getCurrencyBC(target);
+		source = source.toUpperCase();
+		target = target.toUpperCase();
+		String dataSource = "None";
 
-			if (response.getValue().isEmpty()) {
-				throw new Exception("Nenhuma resposa retornada do banco central");
+
+		CurrencyEntity currencyEntity = new CurrencyEntity();
+		currencyEntity.setSource(source);
+		currencyEntity.setTarget(target);
+
+		if (source.equals(target)) {
+			currencyEntity.setConversionRate(1);
+		} else {
+			double currencySource = 1;
+			double currencyTarget = 1;
+
+			if (!source.equals("BRL")) {
+				CurrencyBCReponse response = currencyBCClient.getCurrencyBC(source);
+				if (response.getValue().isEmpty()) throw new Exception("currency not found for "+source);
+				currencySource = response.getValue().get(0).getCotacaoVenda();
 			}
 
-			double cotacaoVenda = response.getValue().get(0).getCotacaoVenda();
+			if (!target.equals("BRL")) {
+				CurrencyBCReponse response = currencyBCClient.getCurrencyBC(target);
+				if (response.getValue().isEmpty()) throw new Exception("currency not found for "+target);
+				currencyTarget = response.getValue().get(0).getCotacaoVenda();
+			}
 
-			currency = new CurrencyEntity();
-			currency.setSource(source);
-			currency.setTarget(target);
-			currency.setConversionRate(cotacaoVenda);
-		} else {
-			currency = repository.findBySourceAndTarget(source, target)
-					.orElseThrow(() -> new Exception("Currency not supported!!!"));
+			currencyEntity.setConversionRate(currencySource / currencyTarget);
+			dataSource = "API BCB";
 		}
 
-		currency.setConvertedValue(value * currency.getConversionRate());
-		currency.setEnvironment(""+serverPort);
+		currencyEntity.setConvertedValue(value * currencyEntity.getConversionRate());
+		currencyEntity.setEnvironment("service: currency - port: "+serverPort + " - source: "+dataSource);
 
-		return ResponseEntity.ok(currency);
+		return ResponseEntity.ok(currencyEntity);
 	}
 	
 
