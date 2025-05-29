@@ -3,6 +3,7 @@ package br.edu.atitus.currency_service.controllers;
 import br.edu.atitus.currency_service.clients.CurrencyBCClient;
 import br.edu.atitus.currency_service.clients.CurrencyBCReponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.expression.ExpressionException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,23 +50,30 @@ public class CurrencyController {
 		if (source.equals(target)) {
 			currencyEntity.setConversionRate(1);
 		} else {
-			double currencySource = 1;
-			double currencyTarget = 1;
+			try {
+				double currencySource = 1;
+				double currencyTarget = 1;
 
-			if (!source.equals("BRL")) {
-				CurrencyBCReponse response = currencyBCClient.getCurrencyBC(source);
-				if (response.getValue().isEmpty()) throw new Exception("currency not found for "+source);
-				currencySource = response.getValue().get(0).getCotacaoVenda();
+				if (!source.equals("BRL")) {
+					CurrencyBCReponse response = currencyBCClient.getCurrencyBC(source);
+					if (response.getValue().isEmpty()) throw new Exception("currency not found for " + source);
+					currencySource = response.getValue().get(0).getCotacaoVenda();
+				}
+
+				if (!target.equals("BRL")) {
+					CurrencyBCReponse response = currencyBCClient.getCurrencyBC(target);
+					if (response.getValue().isEmpty()) throw new Exception("currency not found for " + target);
+					currencyTarget = response.getValue().get(0).getCotacaoVenda();
+				}
+
+				currencyEntity.setConversionRate(currencySource / currencyTarget);
+				dataSource = "API BCB";
+			} catch (Exception e) {
+				currencyEntity = repository.findBySourceAndTarget(source, target)
+						.orElseThrow(() -> new Exception("Currency unsupported"));
+				dataSource = "Local Database";
 			}
 
-			if (!target.equals("BRL")) {
-				CurrencyBCReponse response = currencyBCClient.getCurrencyBC(target);
-				if (response.getValue().isEmpty()) throw new Exception("currency not found for "+target);
-				currencyTarget = response.getValue().get(0).getCotacaoVenda();
-			}
-
-			currencyEntity.setConversionRate(currencySource / currencyTarget);
-			dataSource = "API BCB";
 		}
 
 		currencyEntity.setConvertedValue(value * currencyEntity.getConversionRate());

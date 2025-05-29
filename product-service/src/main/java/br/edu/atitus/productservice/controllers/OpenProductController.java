@@ -38,8 +38,14 @@ public class OpenProductController {
             product.setConvertedPrice(product.getPrice());
         } else {
             CurrencyResponse currency = currencyClient.getCurrency(product.getPrice(), product.getCurrency(), targetCurrency);
-            product.setEnvironment(product.getEnvironment() + " " + currency.getEnvironment());
-            product.setConvertedPrice(currency.getConvertedValue());
+
+            if (currency != null) {
+                product.setEnvironment("service: product - port: "+product.getEnvironment() + " // "+ currency.getEnvironment());
+                product.setConvertedPrice(currency.getConvertedValue());
+            } else {
+                product.setConvertedPrice(-1);
+                product.setEnvironment("service: product - port: "+product.getEnvironment() + " // Currency unavailable");
+            }
         }
 
         return ResponseEntity.ok(product);

@@ -1,7 +1,5 @@
 package br.edu.atitus.productservice.clients;
 
-
-
 public class CurrencyResponse {
     private Long id;
     private String source;
