@@ -23,7 +23,7 @@ public class GatewayConfig {
                         .uri("lb://currency-service"))
                 .route(p -> p
                         .path("/products/**")
-                        .uri("lb:/product-service"))
+                        .uri("lb://product-service"))
                 .build();
     }
 

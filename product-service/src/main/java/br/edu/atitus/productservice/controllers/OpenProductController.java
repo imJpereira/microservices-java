@@ -57,6 +57,8 @@ public class OpenProductController {
                     product.setEnvironment("service: product - port: " + product.getEnvironment() + " // Currency unavailable");
                 }
             }
+
+            cacheManager.getCache(nameCache).put(keyCache, product);
         } else {
             product.setEnvironment("service: product - port:" + serverPort + " (cache) // " + targetCurrency);
         }
